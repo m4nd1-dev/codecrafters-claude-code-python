@@ -27,18 +27,32 @@ def main():
                 "name": "Read",
                 "description": "Read and return the contents of the file",
                 "parameters": {
-                    "file_path": {
-                        "type": "string",
-                        "description": "The path to the file to read"
-                    }
-                },
+                        "type": "object",
+                        "properties":{
+                            "file_path": {
+                                "type": "string",
+                                "description": "The path to the file to read"
+                            }
+                    },
                 "required": ["file_path"]
+                }
             }
         }]
     )
 
     if not chat.choices or len(chat.choices) == 0:
         raise RuntimeError("no choices in response")
+    
+    message = chat.choices[0].message
+    
+    if message.tool_calls:
+        tool_call = message.tool_calls[0]
+        name = tool_call.function.name
+        arguments = json.loads(tool_call.function.arguments)
+        result = execute_tool(name, arguments)
+        sys.stdout.write(result)
+    else:
+        print(message.content)
 
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
