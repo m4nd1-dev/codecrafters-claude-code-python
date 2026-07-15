@@ -8,6 +8,12 @@ from openai import OpenAI
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", default="https://openrouter.ai/api/v1")
 
+def execute_tool(name, arguments):
+    if name == "Read":
+        with open(arguments["file_path"], "r") as f:
+            return f.read()
+    raise RuntimeError(f"unknown tool: {name}")
+
 
 def main():
     p = argparse.ArgumentParser()
