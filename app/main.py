@@ -54,8 +54,13 @@ def execute_tool(name, arguments):
         with open(arguments["file_path"], "r") as f:
             return f.read()
     if name == "Write":
-        with open(arguments["file_path"], "w") as f:
-            return f.write()
+        path = arguments["file_path"]
+        parent = os.path.dirname(path)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        with open(path, "w") as f:
+            f.write(arguments["content"])
+        return "File written successfully"
     raise RuntimeError(f"unknown tool: {name}")
 
 
