@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import sys
+import subprocess
 
 from openai import OpenAI
 
@@ -31,21 +32,38 @@ TOOLS = [
             "name": "Write",
             "description": "Write content to a file",
             "parameters": {
-            "type": "object",
-            "required": ["file_path", "content"],
-            "properties": {
-                "file_path": {
-                "type": "string",
-                "description": "The path of the file to write to"
+                "type": "object",
+                "required": ["file_path", "content"],
+                "properties": {
+                    "file_path": {
+                        "type": "string",
+                        "description": "The path of the file to write to",
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "The content to write to the file",
+                    },
                 },
-                "content": {
-                "type": "string",
-                "description": "The content to write to the file"
-                }
-            }
-            }
-        }
-    }
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "Bash",
+            "description": "Execute a shell command",
+            "parameters": {
+                "type": "object",
+                "required": ["command"],
+                "properties": {
+                    "command": {
+                        "type": "string",
+                        "description": "The command to execute",
+                    }
+                },
+            },
+        },
+    },
 ]
 
 
@@ -61,6 +79,16 @@ def execute_tool(name, arguments):
         with open(path, "w") as f:
             f.write(arguments["content"])
         return "File written successfully"
+    if name == "Bash":
+        command = arguments["command"]
+        proc = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        output = proc.stdout + proc.stderr
+        return output if output else "Command executed successfully"
     raise RuntimeError(f"unknown tool: {name}")
 
 
