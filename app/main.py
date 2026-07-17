@@ -54,7 +54,7 @@ def execute_tool(name, arguments):
         with open(arguments["file_path"], "r") as f:
             return f.read()
     if name == "Write":
-        with open(arguments["file_path"], "r") as f:
+        with open(arguments["file_path"], "w") as f:
             return f.write()
     raise RuntimeError(f"unknown tool: {name}")
 
